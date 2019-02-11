@@ -1,3 +1,6 @@
+// Google: What are some of the things you wouldnt wish on your worst enemy?
+// Lemmie tell you mine.
+// I could wish the worst to my enemies... but NEVER to code the vulkan API from scratch without documentation.
 #define OUT
 
 #include <iostream>
@@ -13,8 +16,18 @@
 //#include <vulkan/vulkan_wayland.h>
 //#include <vulkan/vulkan_android.h>
 
+void InitInstance(VkInstanceCreateInfo* InstInfo, std::vector<const char*> InstanceExtensionNames);
+void InitQueue();
+void InitBuffer();
+
+VkResult InitScreen(VkInstance Instance, VkSurfaceKHR Surface, uint32_t Width, uint32_t Height);
+
+void InitSwapchain();
+
 
 int main() {
+   
+   //In **********************
     //Load extensions
     std::vector<const char*> InstanceExtensionNames;
     InstanceExtensionNames.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
@@ -24,17 +37,7 @@ int main() {
     VkInstance Instance;
     VkResult Result;
     VkInstanceCreateInfo InstInfo;
-    InstInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    InstInfo.pNext = NULL;
-    InstInfo.flags = 0;
-    InstInfo.pApplicationInfo = NULL;
-    InstInfo.enabledLayerCount = 0;
-    InstInfo.ppEnabledLayerNames = NULL;
-    InstInfo.enabledExtensionCount = InstanceExtensionNames.size();
-    InstInfo.ppEnabledExtensionNames = InstanceExtensionNames.data();
-
-
-
+    InitInstance(&InstInfo,InstanceExtensionNames);
     Result = vkCreateInstance(OUT &InstInfo, NULL, OUT &Instance);
     if (Result == VK_ERROR_INCOMPATIBLE_DRIVER) {
         std::cout << "cannot find a compatible Vulkan ICD\n";
@@ -43,23 +46,27 @@ int main() {
         std::cout << "unknown error\n";
         exit(-1);
     }
+  //OUT ***********************
 
+  //IN ************************ Instance,
     //Get the number of GPUs avalible
     uint32_t gpu_count = 1;
-    VkResult GpuRes = vkEnumeratePhysicalDevices(Instance,OUT &gpu_count, NULL);
+    Result = vkEnumeratePhysicalDevices(Instance,OUT &gpu_count, NULL);
     //Allocate space and get the list of devices
     std::vector<VkPhysicalDevice> DeviceList;
     DeviceList.resize(gpu_count);
-    GpuRes = vkEnumeratePhysicalDevices(Instance,OUT &gpu_count, DeviceList.data());
+    Result = vkEnumeratePhysicalDevices(Instance,OUT &gpu_count, DeviceList.data());
+  //OUT *********************** DeviceList
 
-
-    //Queue info
+  //IN ************************ DeviceList 
     VkDeviceQueueCreateInfo QueueInfo = {};
-
     //Initialise first queuefamily and find the properties.
     std::vector<VkQueueFamilyProperties> QueueProps;
-    uint32_t QueueFamilyCount = 1;
-    
+    uint32_t QueueFamilyCount = QueueProps.size();
+    //Device to store the GPU in.
+    VkDevice Device;
+
+
     vkGetPhysicalDeviceQueueFamilyProperties(DeviceList[0],OUT &QueueFamilyCount,NULL);
     QueueProps.resize(QueueFamilyCount); 
     vkGetPhysicalDeviceQueueFamilyProperties(
@@ -85,7 +92,9 @@ int main() {
     QueueInfo.queueCount = 1;
     QueueInfo.pQueuePriorities = QueuePriorities;
 
+
     //Creating the logical device
+
     VkDeviceCreateInfo DeviceInfo = {};
     DeviceInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     DeviceInfo.pNext = NULL;
@@ -97,10 +106,12 @@ int main() {
     DeviceInfo.ppEnabledExtensionNames = 0;
     DeviceInfo.pEnabledFeatures = NULL;
 
-    VkDevice Device;
+
     Result = vkCreateDevice(DeviceList[0],OUT &DeviceInfo,NULL,OUT &Device);
     assert(Result == VK_SUCCESS);
+  //OUT ************************** QueueFamily, Device, QueueInfo
 
+  //IN *************************** Device, QueueInfo, 
     //Init a command pool
     VkCommandPool CmdPool;
     //Create a command buffer pool
@@ -123,10 +134,13 @@ int main() {
     Cmd.commandBufferCount = 1;
 
     Result = vkAllocateCommandBuffers(Device, OUT &Cmd, OUT &CmdBuffer);
+  //OUT ************************* CmdBuffer
 
-    
-    
+  //IN ************************** DeviceList, 
     VkSurfaceKHR Surface;
+    uint16_t Width = 400;
+    uint16_t Height = 400;
+
     //Iterate over each queue to see if it supports presenting
     VkBool32 *pSupportsPresent = (VkBool32 *)malloc(QueueFamilyCount * sizeof(VkBool32));
     for (uint32_t i = 0; i < QueueFamilyCount; i++) {
@@ -160,98 +174,10 @@ int main() {
         }
     }
     free(pSupportsPresent);
+  //Out ************************
 
+    //IN *************************
     //#if defined(VK_USE_PLATFORM_XCB_KHR)
-    const xcb_setup_t *setup;
-    xcb_screen_iterator_t iter;
-    int scr;
-
-    xcb_connection_t *Connection = xcb_connect(NULL, &scr);
-    if (Connection == NULL || xcb_connection_has_error(Connection)) {
-        std::cout << "Unable to make an XCB connection\n";
-        exit(-1);
-    }
-
-    setup = xcb_get_setup(Connection);
-    iter = xcb_setup_roots_iterator(setup);
-    while (scr-- > 0) xcb_screen_next(&iter);
-
-    xcb_screen_t *Screen = iter.data;
-
-    uint16_t Width = 400;
-    uint16_t Height = 400;
-
-    uint32_t value_mask, value_list[32];
-
-    uint32_t Window = xcb_generate_id(Connection);
-
-    value_mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
-    value_list[0] = Screen->black_pixel;
-    value_list[1] = XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_EXPOSURE;
-
-    xcb_create_window(Connection, XCB_COPY_FROM_PARENT, Window, Screen->root, 0, 0, Width, Height, 0,
-                      XCB_WINDOW_CLASS_INPUT_OUTPUT, Screen->root_visual, value_mask, value_list);
-
-    /* Magic code that will send notification when window is destroyed */
-    xcb_intern_atom_cookie_t cookie = xcb_intern_atom(Connection, 1, 12, "WM_PROTOCOLS");
-    xcb_intern_atom_reply_t *reply = xcb_intern_atom_reply(Connection, cookie, 0);
-
-    xcb_intern_atom_cookie_t cookie2 = xcb_intern_atom(Connection, 0, 16, "WM_DELETE_WINDOW");
-    xcb_intern_atom_reply_t *AtomWmDeleteWindow = xcb_intern_atom_reply(Connection, cookie2, 0);
-
-    xcb_change_property(Connection, XCB_PROP_MODE_REPLACE, Window, (*reply).atom, 4, 32, 1,
-                        &(*AtomWmDeleteWindow).atom);
-    free(reply);
-
-    xcb_map_window(Connection, Window);
-
-    // Force the x/y coordinates to 100,100 results are identical in consecutive
-    // runs
-    const uint32_t coords[] = {100, 100};
-
-    xcb_configure_window(Connection, Window, XCB_CONFIG_WINDOW_Y, coords);
-    xcb_flush(Connection);
-
-    xcb_generic_event_t *e;
-    while ((e = xcb_wait_for_event(Connection))) {
-        if ((e->response_type & ~0x80) == XCB_EXPOSE) break;
-    }
-    
-    //#endif
-
-    // Construct the surface description:
-    #ifdef _WIN32
-        VkWin32SurfaceCreateInfoKHR CreateInfo = {};
-        CreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-        CreateInfo.pNext = NULL;
-        CreateInfo.hinstance = Connection;
-        CreateInfo.hwnd = Window;
-        Result = vkCreateWin32SurfaceKHR(Instance,OUT &CreateInfo, NULL, &Surface);
-    #elif defined(__ANDROID__)
-        GET_INSTANCE_PROC_ADDR(Instance, CreateAndroidSurfaceKHR);
-
-        VkAndroidSurfaceCreateInfoKHR CreateInfo;
-        CreateInfo.sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
-        CreateInfo.pNext = nullptr;
-        CreateInfo.flags = 0;
-        CreateInfo.window = AndroidGetApplicationWindow();
-        Result = info.fpCreateAndroidSurfaceKHR(Instance,OUT &CreateInfo, nullptr, &Surface);
-    #elif defined(VK_USE_PLATFORM_WAYLAND_KHR)
-        VkWaylandSurfaceCreateInfoKHR CreateInfo = {};
-        CreateInfo.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
-        CreateInfo.pNext = NULL;
-        CreateInfo.display = info.display;
-        CreateSurface = Window;
-        Result = vkCreateWaylandSurfaceKHR(Instance,OUT &CreateInfo, NULL, &Surface);
-    #else
-        VkXcbSurfaceCreateInfoKHR CreateInfo = {};
-        CreateInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
-        CreateInfo.pNext = NULL;
-        CreateInfo.connection = Connection;
-        CreateInfo.window = Window;
-        Result = vkCreateXcbSurfaceKHR(Instance, OUT &CreateInfo, NULL, &Surface);
-    #endif  // _WIN32
-        assert(Result == VK_SUCCESS);
 
         VkSwapchainCreateInfoKHR SwapchainCi = {};
         SwapchainCi.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
@@ -354,7 +280,10 @@ int main() {
         }
         free(SwapchainImages);
 
+    //OUT *************************************** Swapchain
 
+
+    //IN ****************************************
         VkImageCreateInfo ImageInfo = {};
         const VkFormat DepthFormat = VK_FORMAT_D16_UNORM;
         VkFormatProperties Props;
@@ -414,15 +343,120 @@ int main() {
             ViewInfo.subresourceRange.layerCount = 1;
             ViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
             ViewInfo.flags = 0;
-
-        ViewInfo.image = Depth.image;
-
+            ViewInfo.subresourceRange.levelCount = 1;
+            ViewInfo.subresourceRange.baseArrayLayer =MemAlloc.memoryTypeIndex = 0;
+            ViewInfo.image = Depth.image;
         vkAllocateMemory(Device,&MemAlloc,NULL, &Depth.mem);
         vkBindImageMemory(Device,Depth.image,Depth.mem,0);
 
+    //OUT ************************************************
+
         Result = vkCreateImageView(Device,&ViewInfo,NULL,&Depth.view);
 
+        //END  ************************************************
         vkDestroyDevice(Device, NULL);
         vkDestroyInstance(Instance, NULL);
         return 0;
+}
+
+void InitInstance(VkInstanceCreateInfo OUT *InstInfo, std::vector<const char*> InstanceExtensionNames){
+    InstInfo->sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    InstInfo->pNext = NULL;
+    InstInfo->flags = 0;
+    InstInfo->pApplicationInfo = NULL;
+    InstInfo->enabledLayerCount = 0;
+    InstInfo->ppEnabledLayerNames = NULL;
+    InstInfo->enabledExtensionCount = InstanceExtensionNames.size();
+    InstInfo->ppEnabledExtensionNames = InstanceExtensionNames.data();
+ }
+
+
+
+VkResult InitScreen(VkInstance Instance, VkSurfaceKHR Surface, uint32_t Width, uint32_t Height){
+     const xcb_setup_t *setup;
+    xcb_screen_iterator_t iter;
+    int scr;
+
+    xcb_connection_t *Connection = xcb_connect(NULL, &scr);
+    if (Connection == NULL || xcb_connection_has_error(Connection)) {
+        std::cout << "Unable to make an XCB connection\n";
+        exit(-1);
     }
+
+    setup = xcb_get_setup(Connection);
+    iter = xcb_setup_roots_iterator(setup);
+    while (scr-- > 0) xcb_screen_next(&iter);
+
+    xcb_screen_t *Screen = iter.data;
+
+
+
+    uint32_t value_mask, value_list[32];
+
+    uint32_t Window = xcb_generate_id(Connection);
+
+    value_mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
+    value_list[0] = Screen->black_pixel;
+    value_list[1] = XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_EXPOSURE;
+
+    xcb_create_window(Connection, XCB_COPY_FROM_PARENT, Window, Screen->root, 0, 0, Width, Height, 0,
+                      XCB_WINDOW_CLASS_INPUT_OUTPUT, Screen->root_visual, value_mask, value_list);
+
+    /* Magic code that will send notification when window is destroyed */
+    xcb_intern_atom_cookie_t cookie = xcb_intern_atom(Connection, 1, 12, "WM_PROTOCOLS");
+    xcb_intern_atom_reply_t *reply = xcb_intern_atom_reply(Connection, cookie, 0);
+
+    xcb_intern_atom_cookie_t cookie2 = xcb_intern_atom(Connection, 0, 16, "WM_DELETE_WINDOW");
+    xcb_intern_atom_reply_t *AtomWmDeleteWindow = xcb_intern_atom_reply(Connection, cookie2, 0);
+
+    xcb_change_property(Connection, XCB_PROP_MODE_REPLACE, Window, (*reply).atom, 4, 32, 1,
+                        &(*AtomWmDeleteWindow).atom);
+    free(reply);
+
+    xcb_map_window(Connection, Window);
+
+    // Force the x/y coordinates to 100,100 results are identical in consecutive
+    // runs
+    const uint32_t coords[] = {100, 100};
+
+    xcb_configure_window(Connection, Window, XCB_CONFIG_WINDOW_Y, coords);
+    xcb_flush(Connection);
+
+    xcb_generic_event_t *e;
+    while ((e = xcb_wait_for_event(Connection))) {
+        if ((e->response_type & ~0x80) == XCB_EXPOSE) break;
+    }
+
+
+    #ifdef _WIN32
+        VkWin32SurfaceCreateInfoKHR CreateInfo = {};
+        CreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+        CreateInfo.pNext = NULL;
+        CreateInfo.hinstance = Connection;
+        CreateInfo.hwnd = Window;
+        return = vkCreateWin32SurfaceKHR(Instance,OUT &CreateInfo, NULL, &Surface);
+    #elif defined(__ANDROID__)
+        GET_INSTANCE_PROC_ADDR(Instance, CreateAndroidSurfaceKHR);
+
+        VkAndroidSurfaceCreateInfoKHR CreateInfo;
+        CreateInfo.sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
+        CreateInfo.pNext = nullptr;
+        CreateInfo.flags = 0;
+        CreateInfo.window = AndroidGetApplicationWindow();
+        return = info.fpCreateAndroidSurfaceKHR(Instance,OUT &CreateInfo, nullptr, &Surface);
+    #elif defined(VK_USE_PLATFORM_WAYLAND_KHR)
+        VkWaylandSurfaceCreateInfoKHR CreateInfo = {};
+        CreateInfo.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
+        CreateInfo.pNext = NULL;
+        CreateInfo.display = info.display;
+        CreateSurface = Window;
+        return = vkCreateWaylandSurfaceKHR(Instance,OUT &CreateInfo, NULL, &Surface);
+    #else
+        VkXcbSurfaceCreateInfoKHR CreateInfo = {};
+        CreateInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
+        CreateInfo.pNext = NULL;
+        CreateInfo.connection = Connection;
+        CreateInfo.window = Window;
+        return vkCreateXcbSurfaceKHR(Instance, OUT &CreateInfo, NULL, &Surface);
+    #endif  // _WIN32
+ }

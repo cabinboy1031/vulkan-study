@@ -14,6 +14,7 @@
 #include "../inc/init.hpp"
 
 int main() {
+
     VulkanInit VkEngine;
 
     try {
@@ -25,3 +26,8 @@ int main() {
 
     return EXIT_SUCCESS;
 }
+VkResult createDebugUtilsMessengerEXT(
+    VkInstance Instance, 
+    const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, 
+    const VkAllocationCallbacks* pAllocator,
+    VkDebugUtilsMessengerEXT* pDebugMessenger);

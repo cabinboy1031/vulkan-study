@@ -2,25 +2,17 @@ cmake_minimum_required(VERSION 3.7 FATAL_ERROR)
 project(vulkan-study VERSION 0.0.1)
 
 find_package(Vulkan REQUIRED)
+#find_package(glfw REQUIRED)
 add_executable(vulkan-study 
     src/main.cpp
+    inc/init.hpp
+    src/init.cpp
     )
 
-target_link_libraries(vulkan-study Vulkan::Vulkan)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+add_subdirectory(lib/glfw/)
 
-IF (NOT WIN32)
-  # use pkg-config to get the directories and then use these values
-  # in the FIND_PATH() and FIND_LIBRARY() calls
-  FIND_PACKAGE(PkgConfig)
-  PKG_CHECK_MODULES(PKG_X11_XCB QUIET x11-xcb)
+target_link_libraries(vulkan-study glfw Vulkan::Vulkan )
 
-  SET(X11_XCB_DEFINITIONS ${PKG_X11_XCB_CFLAGS})
-
-  FIND_PATH(X11_XCB_INCLUDE_DIR NAMES X11/Xlib-xcb.h HINTS ${PKG_X11_XCB_INCLUDE_DIRS})
-  FIND_LIBRARY(X11_XCB_LIBRARIES NAMES X11-xcb HINTS ${PKG_X11_XCB_LIBRARY_DIRS})
-
-  include(FindPackageHandleStandardArgs)
-  FIND_PACKAGE_HANDLE_STANDARD_ARGS(X11_XCB DEFAULT_MSG X11_XCB_LIBRARIES X11_XCB_INCLUDE_DIR)
-
-  MARK_AS_ADVANCED(X11_XCB_INCLUDE_DIR X11_XCB_LIBRARIES)
-ENDIF (NOT WIN32)

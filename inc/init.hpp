@@ -1,24 +1,23 @@
 #ifndef _INIT
 #define _INIT
-#include <vector>
-#include <vulkan/vulkan_core.h>
 
+const int WINDOW_WIDTH = 400;
+const int WINDOW_HEIGHT = 400;
 
-//Initialise the entire instance
-void Initialisation(
-    VkInstance *Instance,std::vector<VkPhysicalDevice> *DeviceList, 
-    VkCommandPool *CmdPool);
+class VulkanInit{
+public:
+    void run() ;
+private:
+    GLFWwindow* Window;
+    VkInstance Instance;
 
+    void initWindow();
+    void initVulkan();
+    void mainLoop();
+    void cleanup();
 
-//Initialise a buffer and assign it to a pool.
-void CreateBuffer(
-    VkCommandBuffer *Buffer,
-    VkCommandBufferAllocateInfo *Cmd,
-    VkCommandPool CmdPool, 
-    VkCommandBufferLevel Level = VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+    //all the vulkan stuff
+    void instanceInit();
 
-
-
-
-
+};
 #endif

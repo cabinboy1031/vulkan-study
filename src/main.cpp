@@ -8,16 +8,20 @@
 #include <cassert>
 #include <vector>
 
-#include <vulkan/vulkan.h>
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
 
-void InitInstance(VkInstanceCreateInfo* InstInfo, std::vector<const char*> InstanceExtensionNames);
-void InitQueue();
-void InitBuffer();
-
-VkResult InitScreen(VkInstance Instance, VkSurfaceKHR Surface, uint32_t Width, uint32_t Height);
-
-void InitSwapchain();
-
+#include "../inc/init.hpp"
 
 int main() {
+    VulkanInit VkEngine;
+
+    try {
+        VkEngine.run();
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }

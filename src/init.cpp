@@ -3,6 +3,7 @@
 #include<cstdlib>
 #include<vector>
 #include<cstring>
+#include<map>
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -30,7 +31,7 @@ void VulkanInit::initWindow(){
 void VulkanInit::initVulkan(){
     instanceInit();
     setupDebugMessenger();
-    
+    pickPhysicalDevice();
 }
 
 void VulkanInit::mainLoop(){
@@ -84,6 +85,46 @@ void VulkanInit::instanceInit(){
     std::cout << "Success!" << std::endl;
 }
 
+void VulkanInit::pickPhysicalDevice(){
+    uint32_t DeviceCount = 0;
+    vkEnumeratePhysicalDevices(Instance,&DeviceCount,nullptr);
+    if (DeviceCount == 0) {
+        throw std::runtime_error("Failed to find GPUs with Vulkan support!");
+    }
+
+    std::vector<VkPhysicalDevice> Devices(DeviceCount);
+    vkEnumeratePhysicalDevices(Instance,&DeviceCount,Devices.data());
+
+    std::multimap<int,VkPhysicalDevice> Candidates;
+
+    for(const auto& Device : Devices){
+        int Score = rateDeviceSuitability(Device);
+        Candidates.insert(std::make_pair(Score,Device));
+        }
+
+        if (Candidates.rbegin()->first > 0) {
+            PhyicalDevice = Candidates.rbegin()->second;
+        } else {
+            throw std::runtime_error("Failed to find a suitable GPU!");
+        }
+    }
+
+
+int VulkanInit::rateDeviceSuitability(VkPhysicalDevice Device){
+    VkPhysicalDeviceProperties DeviceProps;
+    vkGetPhysicalDeviceProperties(Device,&DeviceProps);
+    int Score = 0;
+
+    //Discrete GPUs have a signifigant performance advantage
+    if (DeviceProps.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+        Score +=1000;
+    }
+
+    //Maximum possible size of textures affects graphics quality
+    Score += DeviceProps.limits.maxImageDimension2D;
+
+    return Score;
+}
 
 bool VulkanInit::checkValidationLayerSupport(){
     std::cout << "Checking for validation layers..." << std::endl;

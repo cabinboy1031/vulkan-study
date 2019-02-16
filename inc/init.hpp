@@ -20,7 +20,7 @@ public:
 private:
     GLFWwindow* Window;
     VkInstance Instance;
-    VkDebugUtilsMessengerEXT DebugMessenger;
+    VkPhysicalDevice PhyicalDevice = VK_NULL_HANDLE;
 
     void initWindow();
     void initVulkan();
@@ -31,7 +31,16 @@ private:
     void instanceInit();
     std::vector<const char*> getRequiredExtensions();
 
+    //find and pick a Physical device    
+    void pickPhysicalDevice();
+    int  rateDeviceSuitability(VkPhysicalDevice Device);
+
+    //TODO Find the queue families.
+
+
     //Debug functions
+    VkDebugUtilsMessengerEXT DebugMessenger;
+
     bool checkValidationLayerSupport();
     void setupDebugMessenger();
     

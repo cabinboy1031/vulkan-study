@@ -16,11 +16,20 @@ const std::vector<const char*> ValidationLayers = {
 
 class VulkanInit{
 public:
-    void run() ;
+    void run();
+
 private:
     GLFWwindow* Window;
     VkInstance Instance;
-    VkPhysicalDevice PhyicalDevice = VK_NULL_HANDLE;
+    VkPhysicalDevice PhysicalDevice = VK_NULL_HANDLE;
+    VkDevice Device;
+    VkQueue GraphicsQueue;
+    VkSurfaceKHR Surface;
+    VkQueue PresentQueue;
+
+    const std::vector<const char*> DeviceExtentions = {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME
+    };
 
     void initWindow();
     void initVulkan();
@@ -35,8 +44,16 @@ private:
     void pickPhysicalDevice();
     int  rateDeviceSuitability(VkPhysicalDevice Device);
 
-    //TODO Find the queue families.
+    //Find the queue families.
+    struct QueueFamilyIndices;
+    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice Device);
+    bool isDeviceSuitable(VkPhysicalDevice Device);
+    bool checkDeviceExtensionSupport(VkPhysicalDevice Device);
+    //Create a logical device
+    void createLogicalDevice();
 
+    //Create a window surfdce
+    void createSurface();
 
     //Debug functions
     VkDebugUtilsMessengerEXT DebugMessenger;

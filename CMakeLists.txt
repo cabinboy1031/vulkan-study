@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.7 FATAL_ERROR)
 project(vulkan-study VERSION 0.0.1)
 
+
 find_package(Vulkan REQUIRED)
 #find_package(glfw REQUIRED)
 add_executable(vulkan-study 
@@ -16,3 +17,5 @@ add_subdirectory(lib/glfw/)
 
 target_link_libraries(vulkan-study glfw Vulkan::Vulkan )
 
+set_property(TARGET vulkan-study PROPERTY CXX_STANDARD 17)
+set_property(TARGET vulkan-study PROPERTY CXX_STANDARD_REQUIRED ON)

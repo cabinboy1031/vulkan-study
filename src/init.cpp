@@ -4,11 +4,28 @@
 #include<vector>
 #include<cstring>
 #include<map>
+#include<optional>
+#include<set>
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#define OUT 
 #include "../inc/init.hpp"
+
+
+struct VulkanInit::QueueFamilyIndices {
+	std::optional<uint32_t> GraphicsFamily;
+    std::optional<uint32_t> PresentFamily;
+    bool isComplete() {
+        return GraphicsFamily.has_value() && PresentFamily.has_value();
+    }
+};
+struct SwapChainSupportDetails { //TODO Where i left off. Start at this point.
+    VkSurfaceCapabilitiesKHR Capabilitities;
+    std::vector<VkSurfaceFormatKHR> Formats;
+    std::vector<VkPresentModeKHR> PresentModes;
+};
 
 void VulkanInit::run() {
     initWindow();
@@ -31,7 +48,9 @@ void VulkanInit::initWindow(){
 void VulkanInit::initVulkan(){
     instanceInit();
     setupDebugMessenger();
+    createSurface();
     pickPhysicalDevice();
+    createLogicalDevice();
 }
 
 void VulkanInit::mainLoop(){
@@ -103,7 +122,7 @@ void VulkanInit::pickPhysicalDevice(){
         }
 
         if (Candidates.rbegin()->first > 0) {
-            PhyicalDevice = Candidates.rbegin()->second;
+            PhysicalDevice = Candidates.rbegin()->second;
         } else {
             throw std::runtime_error("Failed to find a suitable GPU!");
         }
@@ -126,6 +145,102 @@ int VulkanInit::rateDeviceSuitability(VkPhysicalDevice Device){
     return Score;
 }
 
+VulkanInit::QueueFamilyIndices VulkanInit::findQueueFamilies(VkPhysicalDevice Device){
+    QueueFamilyIndices Indices;
+
+    uint32_t QueueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(Device,&QueueFamilyCount OUT, nullptr);
+    std::vector<VkQueueFamilyProperties> QueueFamilies(QueueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(Device,&QueueFamilyCount OUT, QueueFamilies.data());
+
+    int i = 0;
+    for (const auto& QueueFamily: QueueFamilies) {
+        VkBool32 PresentSupport = false;
+        vkGetPhysicalDeviceSurfaceSupportKHR(Device,i,Surface,&PresentSupport);
+
+        if(QueueFamily.queueCount > 0 && QueueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+            Indices.GraphicsFamily = i;
+        }
+        
+        if(QueueFamily.queueCount > 0 && PresentSupport){
+            Indices.PresentFamily = i;
+        }
+
+        if(Indices.isComplete()){
+            break;
+        }
+
+        i++;
+    }
+    return Indices;
+}
+
+bool VulkanInit::isDeviceSuitable(VkPhysicalDevice Device) {
+    QueueFamilyIndices Indices = findQueueFamilies(Device);
+
+    bool ExtensionSupported = checkDeviceExtensionSupport(Device);
+
+    return Indices.isComplete();
+}
+
+bool VulkanInit::checkDeviceExtensionSupport(VkPhysicalDevice Device){
+    uint32_t ExtensionCount;
+    vkEnumerateDeviceExtensionProperties(Device,nullptr,&ExtensionCount,nullptr);
+    
+    std::vector<VkExtensionProperties> AvailableExtensions(ExtensionCount);
+    vkEnumerateDeviceExtensionProperties(Device,nullptr,&ExtensionCount,AvailableExtensions.data());
+
+    std::set<std::string> RequiredExtensions(DeviceExtentions.begin(),DeviceExtentions.end());
+
+    for (const auto& Extension : AvailableExtensions){
+        RequiredExtensions.erase(Extension.extensionName);
+    }
+
+    return RequiredExtensions.empty();
+}
+
+void VulkanInit::createLogicalDevice(){
+    QueueFamilyIndices Indices = findQueueFamilies(PhysicalDevice);
+
+    std::vector<VkDeviceQueueCreateInfo> QueueCreateInfos;
+    std::set<uint32_t> UniqueQueueFamilies = {Indices.GraphicsFamily.value(),Indices.PresentFamily.value()};
+
+    float QueuePriority = 1.0f;
+    for(uint32_t QueueFamily : UniqueQueueFamilies) {
+        VkDeviceQueueCreateInfo QueueCreateInfo = {};
+        QueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        QueueCreateInfo.queueFamilyIndex = QueueFamily;
+        QueueCreateInfo.queueCount = 1;
+        QueueCreateInfo.pQueuePriorities = &QueuePriority;
+        QueueCreateInfos.push_back(QueueCreateInfo);
+    }
+    VkPhysicalDeviceFeatures DeviceFeatures = {};
+
+    VkDeviceCreateInfo CreateInfo {};
+    CreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    CreateInfo.pQueueCreateInfos = QueueCreateInfos.data();
+    CreateInfo.queueCreateInfoCount = static_cast<uint32_t>(QueueCreateInfos.size());
+    CreateInfo.pEnabledFeatures = &DeviceFeatures;
+
+    CreateInfo.enabledExtensionCount = static_cast<uint32_t>(DeviceExtentions.size());
+    CreateInfo.ppEnabledExtensionNames = DeviceExtentions.data();
+
+    if(EnableValidationLayers) {
+        CreateInfo.enabledLayerCount = static_cast<uint32_t>(ValidationLayers.size());
+        CreateInfo.ppEnabledLayerNames = ValidationLayers.data();
+    } else {
+        CreateInfo.enabledLayerCount = 0;
+    }
+
+    if (vkCreateDevice(PhysicalDevice, &CreateInfo, nullptr, &Device) != VK_SUCCESS){
+        throw std::runtime_error("Failed to create logical device!");
+    }
+
+    vkGetDeviceQueue(Device, Indices.GraphicsFamily.value(), 0, &GraphicsQueue);
+    vkGetDeviceQueue(Device, Indices.PresentFamily.value(), 0, &PresentQueue);
+}
+
+//Validation layer checking
 bool VulkanInit::checkValidationLayerSupport(){
     std::cout << "Checking for validation layers..." << std::endl;
     uint32_t LayerCount;
@@ -149,8 +264,8 @@ bool VulkanInit::checkValidationLayerSupport(){
         }
     }
     return true;
-}
-
+} 
+//Extension checking
 std::vector<const char*> VulkanInit::getRequiredExtensions(){
     uint32_t GLFWExtensionCount = 0;
     const char** GLFWExtensions;
@@ -166,6 +281,12 @@ std::vector<const char*> VulkanInit::getRequiredExtensions(){
 
 }
 
+void VulkanInit::createSurface(){
+    if (glfwCreateWindowSurface(Instance,Window,nullptr,&Surface) != VK_SUCCESS){
+        throw std::runtime_error("failed to create window surface!");
+    }
+}
+
 //Destroy all vulkan and glfw components
 void VulkanInit::cleanup(){
     std::cout << "Closing session..." << std::endl;
@@ -173,7 +294,8 @@ void VulkanInit::cleanup(){
         destroyDebugUtilsMessengerEXT(Instance,DebugMessenger,nullptr);
     }
 
-
+    vkDestroyDevice(Device, nullptr);
+    vkDestroySurfaceKHR(Instance,Surface,nullptr);
     vkDestroyInstance(Instance,nullptr);
     glfwDestroyWindow(Window);
     glfwTerminate();
@@ -181,7 +303,6 @@ void VulkanInit::cleanup(){
 
 
 //Make a Debug message
-
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallBack(
         VkDebugUtilsMessageSeverityFlagBitsEXT MessageSeverity,
         VkDebugUtilsMessageTypeFlagsEXT MessageType,

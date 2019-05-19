@@ -1,12 +1,12 @@
 // Google: What are some of the things you wouldnt wish on your worst enemy?
 // Lemmie tell you mine.
 // I could wish the worst to my enemies... but NEVER to code the vulkan API from scratch without documentation.
-#define OUT
 
 #include <iostream>
 #include <cstdlib>
 #include <cassert>
 #include <vector>
+#include <optional>
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -26,8 +26,9 @@ int main() {
 
     return EXIT_SUCCESS;
 }
+/*  
 VkResult createDebugUtilsMessengerEXT(
     VkInstance Instance, 
     const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, 
     const VkAllocationCallbacks* pAllocator,
-    VkDebugUtilsMessengerEXT* pDebugMessenger);
+    VkDebugUtilsMessengerEXT* pDebugMessenger); */

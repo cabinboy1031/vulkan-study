@@ -31,6 +31,9 @@ private:
         VK_KHR_SWAPCHAIN_EXTENSION_NAME
     };
 
+    struct QueueFamilyIndices;
+    struct SwapChainSupportDetails;
+    
     void initWindow();
     void initVulkan();
     void mainLoop();
@@ -45,12 +48,12 @@ private:
     int  rateDeviceSuitability(VkPhysicalDevice Device);
 
     //Find the queue families.
-    struct QueueFamilyIndices;
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice Device);
     bool isDeviceSuitable(VkPhysicalDevice Device);
     bool checkDeviceExtensionSupport(VkPhysicalDevice Device);
     //Create a logical device
     void createLogicalDevice();
+
 
     SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice Device);
 

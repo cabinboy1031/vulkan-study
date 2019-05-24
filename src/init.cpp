@@ -21,7 +21,7 @@ struct VulkanInit::QueueFamilyIndices {
         return GraphicsFamily.has_value() && PresentFamily.has_value();
     }
 };
-struct SwapChainSupportDetails { //TODO Where i left off. Start at this point.
+struct VulkanInit::SwapChainSupportDetails{
     VkSurfaceCapabilitiesKHR Capabilitities;
     std::vector<VkSurfaceFormatKHR> Formats;
     std::vector<VkPresentModeKHR> PresentModes;
@@ -119,15 +119,14 @@ void VulkanInit::pickPhysicalDevice(){
     for(const auto& Device : Devices){
         int Score = rateDeviceSuitability(Device);
         Candidates.insert(std::make_pair(Score,Device));
-        }
-
-        if (Candidates.rbegin()->first > 0) {
-            PhysicalDevice = Candidates.rbegin()->second;
-        } else {
-            throw std::runtime_error("Failed to find a suitable GPU!");
-        }
     }
 
+    if (Candidates.rbegin()->first > 0) {
+            PhysicalDevice = Candidates.rbegin()->second;
+    } else {
+            throw std::runtime_error("Failed to find a suitable GPU!");
+    }
+}
 
 int VulkanInit::rateDeviceSuitability(VkPhysicalDevice Device){
     VkPhysicalDeviceProperties DeviceProps;
@@ -239,6 +238,12 @@ void VulkanInit::createLogicalDevice(){
     vkGetDeviceQueue(Device, Indices.GraphicsFamily.value(), 0, &GraphicsQueue);
     vkGetDeviceQueue(Device, Indices.PresentFamily.value(), 0, &PresentQueue);
 }
+
+VulkanInit::SwapChainSupportDetails VulkanInit::querySwapChainSupport(VkPhysicalDevice Device){
+        SwapChainSupportDetails Details;
+
+        return Details;
+    }
 
 //Validation layer checking
 bool VulkanInit::checkValidationLayerSupport(){

@@ -24,8 +24,8 @@ private:
     VkPhysicalDevice PhysicalDevice = VK_NULL_HANDLE;
     VkDevice Device;
     VkQueue GraphicsQueue;
-    VkSurfaceKHR Surface;
     VkQueue PresentQueue;
+    VkSurfaceKHR Surface;
 
     const std::vector<const char*> DeviceExtentions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -51,6 +51,8 @@ private:
     bool checkDeviceExtensionSupport(VkPhysicalDevice Device);
     //Create a logical device
     void createLogicalDevice();
+
+    SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice Device);
 
     //Create a window surfdce
     void createSurface();

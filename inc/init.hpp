@@ -26,6 +26,12 @@ private:
     VkQueue graphicsQueue;
     VkQueue presentQueue;
     VkSurfaceKHR surface;
+    VkSwapchainKHR swapChain;
+    std::vector<VkImage> swapChainImages;
+    VkFormat swapChainImageFormat;
+    VkExtent2D swapChainExtent;
+    std::vector<VkImageView> swapChainImageViews;
+
 
     const std::vector<const char*> DeviceExtentions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -54,9 +60,18 @@ private:
     //Create a logical device
     void createLogicalDevice();
 
-
     SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 
+    //Setup for fully initializing the swapchain
+    VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& avalibleFormats);
+    VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& avaliblePresentModes);
+    VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+
+    void createSwapChain();
+
+    void createImageViews();
+
+    void createGraphicsPipeline();
     //Create a window surfdce
     void createSurface();
 

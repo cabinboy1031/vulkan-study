@@ -27,7 +27,7 @@ int main() {
     return EXIT_SUCCESS;
 }
 VkResult createDebugUtilsMessengerEXT(
-    VkInstance Instance, 
+    VkInstance instance, 
     const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, 
     const VkAllocationCallbacks* pAllocator,
     VkDebugUtilsMessengerEXT* pDebugMessenger); 

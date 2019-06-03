@@ -4,14 +4,14 @@
 const int WINDOW_WIDTH = 400;
 const int WINDOW_HEIGHT = 400;
 
-const std::vector<const char*> ValidationLayers = {
+const std::vector<const char*> validationLayers = {
     "VK_LAYER_LUNARG_standard_validation"
 };
 
 #ifdef NDEBUG
-    const bool EnableValidationLayers = false;
+    const bool enableValidationLayers = false;
 #else 
-    const bool EnableValidationLayers = true;
+    const bool enableValidationLayers = true;
 #endif
 
 class VulkanInit{
@@ -19,13 +19,13 @@ public:
     void run();
 
 private:
-    GLFWwindow* Window;
-    VkInstance Instance;
-    VkPhysicalDevice PhysicalDevice = VK_NULL_HANDLE;
-    VkDevice Device;
-    VkQueue GraphicsQueue;
-    VkQueue PresentQueue;
-    VkSurfaceKHR Surface;
+    GLFWwindow* window;
+    VkInstance instance;
+    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+    VkDevice device;
+    VkQueue graphicsQueue;
+    VkQueue presentQueue;
+    VkSurfaceKHR surface;
 
     const std::vector<const char*> DeviceExtentions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -45,35 +45,35 @@ private:
 
     //find and pick a Physical device    
     void pickPhysicalDevice();
-    int  rateDeviceSuitability(VkPhysicalDevice Device);
+    int  rateDeviceSuitability(VkPhysicalDevice device);
 
     //Find the queue families.
-    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice Device);
-    bool isDeviceSuitable(VkPhysicalDevice Device);
-    bool checkDeviceExtensionSupport(VkPhysicalDevice Device);
+    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+    bool isDeviceSuitable(VkPhysicalDevice device);
+    bool checkDeviceExtensionSupport(VkPhysicalDevice device);
     //Create a logical device
     void createLogicalDevice();
 
 
-    SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice Device);
+    SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 
     //Create a window surfdce
     void createSurface();
 
     //Debug functions
-    VkDebugUtilsMessengerEXT DebugMessenger;
+    VkDebugUtilsMessengerEXT debugMessenger;
 
     bool checkValidationLayerSupport();
     void setupDebugMessenger();
     
 
     VkResult createDebugUtilsMessengerEXT(
-        VkInstance Instance, 
+        VkInstance instance, 
         const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, 
         const VkAllocationCallbacks* pAllocator,
         VkDebugUtilsMessengerEXT* pDebugMessenger);
 
-    void destroyDebugUtilsMessengerEXT(VkInstance Instance, VkDebugUtilsMessengerEXT DebugMessenger, const VkAllocationCallbacks* pAllocator);
+    void destroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
 
 };
 #endif

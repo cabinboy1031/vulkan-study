@@ -31,6 +31,11 @@ private:
     VkFormat swapChainImageFormat;
     VkExtent2D swapChainExtent;
     std::vector<VkImageView> swapChainImageViews;
+    VkRenderPass renderPass;
+    VkPipelineLayout pipelineLayout;
+    VkPipeline graphicsPipeline;
+    std::vector<VkFramebuffer> swapChainFramebuffers;
+ 
 
 
     const std::vector<const char*> DeviceExtentions = {
@@ -72,6 +77,13 @@ private:
     void createImageViews();
 
     void createGraphicsPipeline();
+    VkShaderModule createShaderModule(const std::vector<char>& code);
+
+    void createRenderPass();
+
+    void createFramebuffers();
+
+    static std::vector<char> readFile(const std::string& filename);
     //Create a window surfdce
     void createSurface();
 
@@ -91,4 +103,5 @@ private:
     void destroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
 
 };
+
 #endif

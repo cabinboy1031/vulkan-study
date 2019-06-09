@@ -35,7 +35,10 @@ private:
     VkPipelineLayout pipelineLayout;
     VkPipeline graphicsPipeline;
     std::vector<VkFramebuffer> swapChainFramebuffers;
- 
+	VkCommandPool commandPool;
+	std::vector<VkCommandBuffer> commandBuffers;
+	VkSemaphore imageAvailableSemaphore;
+	VkSemaphore renderFinishedSemaphore;
 
 
     const std::vector<const char*> DeviceExtentions = {
@@ -50,6 +53,9 @@ private:
     void mainLoop();
     void cleanup();
 
+	void drawFrame();
+
+	void createSemaphores();
     //all the vulkan stuff
     void instanceInit();
     std::vector<const char*> getRequiredExtensions();
@@ -82,6 +88,9 @@ private:
     void createRenderPass();
 
     void createFramebuffers();
+
+	void createCommandPool();
+	void createCommandBuffers();
 
     static std::vector<char> readFile(const std::string& filename);
     //Create a window surfdce

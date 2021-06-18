@@ -1,12 +1,30 @@
 #ifndef _INIT
 #define _INIT
 
+#include<iostream>
+#include<cassert>
+#include<cstdlib>
+#include<vector>
+#include<cstring>
+#include<map>
+#include<optional>
+#include<set>
+#include<algorithm>
+#include<fstream>
+
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
+#define OUT
+
 const int WINDOW_WIDTH = 400;
 const int WINDOW_HEIGHT = 400;
 
 const std::vector<const char*> validationLayers = {
     "VK_LAYER_LUNARG_standard_validation"
 };
+
+#define NDEBUG
 
 #ifdef NDEBUG
     const bool enableValidationLayers = false;
@@ -35,10 +53,10 @@ private:
     VkPipelineLayout pipelineLayout;
     VkPipeline graphicsPipeline;
     std::vector<VkFramebuffer> swapChainFramebuffers;
-	VkCommandPool commandPool;
-	std::vector<VkCommandBuffer> commandBuffers;
-	VkSemaphore imageAvailableSemaphore;
-	VkSemaphore renderFinishedSemaphore;
+    VkCommandPool commandPool;
+    std::vector<VkCommandBuffer> commandBuffers;
+    VkSemaphore imageAvailableSemaphore;
+    VkSemaphore renderFinishedSemaphore;
 
 
     const std::vector<const char*> DeviceExtentions = {
@@ -53,9 +71,9 @@ private:
     void mainLoop();
     void cleanup();
 
-	void drawFrame();
+    void drawFrame();
 
-	void createSemaphores();
+void createSemaphores();
     //all the vulkan stuff
     void instanceInit();
     std::vector<const char*> getRequiredExtensions();
@@ -89,8 +107,8 @@ private:
 
     void createFramebuffers();
 
-	void createCommandPool();
-	void createCommandBuffers();
+    void createCommandPool();
+    void createCommandBuffers();
 
     static std::vector<char> readFile(const std::string& filename);
     //Create a window surfdce

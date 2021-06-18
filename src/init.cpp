@@ -1,18 +1,3 @@
-#include<iostream>
-#include<cassert>
-#include<cstdlib>
-#include<vector>
-#include<cstring>
-#include<map>
-#include<optional>
-#include<set>
-#include<algorithm>
-#include<fstream>
-
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
-#define OUT 
 #include "../inc/init.hpp"
 
 
@@ -57,10 +42,10 @@ void VulkanInit::initVulkan(){
     createImageViews();
     createRenderPass();
     createGraphicsPipeline();
-	createFramebuffers();
-	createCommandPool();
-	createCommandBuffers();
-	createSemaphores();
+    createFramebuffers();
+    createCommandPool();
+    createCommandBuffers();
+    createSemaphores();
 }
 
 //The main logic after init
@@ -111,13 +96,13 @@ void VulkanInit::drawFrame() {
 }
 
 void VulkanInit::createSemaphores(){
-	VkSemaphoreCreateInfo semaphoreInfo = {};
-	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    VkSemaphoreCreateInfo semaphoreInfo = {};
+    semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
-	if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphore) != VK_SUCCESS ||
-		vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphore) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create semaphores!");
-	}
+    if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphore) != VK_SUCCESS ||
+        vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphore) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create semaphores!");
+    }
 
 }
 
@@ -524,8 +509,8 @@ std::vector<char> VulkanInit::readFile(const std::string& filename){
 void VulkanInit::createGraphicsPipeline(){
     //TODO create the graphics pipeline for shaders
 
-    auto vertShaderCode = readFile("./shaders/vert.spv");
-    auto fragShaderCode = readFile("./shaders/frag.spv");
+    auto vertShaderCode = readFile("./shaders/test.vert");
+    auto fragShaderCode = readFile("./shaders/test.frag");
 
     std::cout << "vert size:" << vertShaderCode.size() << std::endl;
     std::cout << "frag size:" << fragShaderCode.size() << std::endl;

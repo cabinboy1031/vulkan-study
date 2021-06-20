@@ -11,6 +11,7 @@
 namespace CbLib::VkEngine{
     class Window:public IVkObject{
         public:
+            Window() {};
             Window(uint32_t, uint32_t);
             void destruct();
 

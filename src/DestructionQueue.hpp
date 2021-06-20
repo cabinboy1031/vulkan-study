@@ -9,7 +9,7 @@ namespace CbLib::VkEngine{
     class DestructionQueue{
         public:
             template <typename VkObject>
-            void push_object(VkObject& to_destruct){
+            void push(VkObject& to_destruct){
                 destructQueue.push_back(std::make_unique<VkObject>(to_destruct));
             }
 

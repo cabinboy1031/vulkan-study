@@ -1,7 +1,9 @@
 #ifndef __INSTANCE_HPP_
 #define __INSTANCE_HPP_
 
+#include <iostream>
 #include <string>
+#include <vector>
 #include <stdexcept>
 
 #ifndef GLFW_INCLUDE_VULKAN
@@ -9,12 +11,14 @@
 #endif
 #include <GLFW/glfw3.h>
 
+#include "ValidationLayers.hpp"
 #include "IVkObject.hpp"
 
 namespace CbLib::VkEngine{
     class Instance:public IVkObject {
     public:
-            Instance(std::string appName);
+            Instance() {};
+            Instance(std::string appName,ValidationLayers validationlayers);
             void destruct();
     private:
         VkInstance instance;

@@ -1,10 +1,9 @@
-#include "Instance.hpp"
-#include "Window.hpp"
+#include "Engine.hpp"
 
 int main(){
-    CbLib::VkEngine::Window window(800, 600);
+    CbLib::VkEngine::Engine engine = CbLib::VkEngine::Engine();
 
-    while(!window.should_close()){
+    while(engine.get_window().should_close()){
         glfwPollEvents();
     }
 

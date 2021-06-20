@@ -1,12 +1,18 @@
 #ifndef __WINDOW_HPP_
 #define __WINDOW_HPP_
-#include "Engine.hpp"
+
+#ifndef GLFW_INCLUDE_VULKAN
+#define GLFW_INCLUDE_VULKAN
+#endif
+#include <GLFW/glfw3.h>
+
+#include "IVkObject.hpp"
 
 namespace CbLib::VkEngine{
-    class Window{
+    class Window:public IVkObject{
         public:
             Window(uint32_t, uint32_t);
-            ~Window();
+            void destruct();
 
             bool should_close();
         private:

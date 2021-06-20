@@ -8,6 +8,7 @@ Window::Window(uint32_t width, uint32_t height){
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
+
     window = glfwCreateWindow(width, height, "Vulkan", nullptr, nullptr);
 }
 
@@ -15,7 +16,7 @@ bool Window::should_close(){
     return glfwWindowShouldClose(window);
 }
 
-Window::~Window(){
+void Window::destruct(){
     glfwDestroyWindow(window);
     glfwTerminate();
 }

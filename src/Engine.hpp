@@ -3,11 +3,17 @@
 
 #define GLFW_INCLUDE_VULKAN
 #include<GLFW/glfw3.h>
+#include "Window.hpp"
+#include "Instance.hpp"
 
 namespace CbLib {
     namespace VkEngine {
-        class Window;
-        class Instance;
+        class Engine{
+            Instance instance;
+            Window window;
+
+
+        };
     }
 }
 

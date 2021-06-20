@@ -1,13 +1,21 @@
 #ifndef __INSTANCE_HPP_
 #define __INSTANCE_HPP_
 
-#include "Engine.hpp"
+#include <string>
+#include <stdexcept>
+
+#ifndef GLFW_INCLUDE_VULKAN
+#define GLFW_INCLUDE_VULKAN
+#endif
+#include <GLFW/glfw3.h>
+
+#include "IVkObject.hpp"
 
 namespace CbLib::VkEngine{
-    class Instance {
+    class Instance:public IVkObject {
     public:
-            Instance();
-
+            Instance(std::string appName);
+            void destruct();
     private:
         VkInstance instance;
     };

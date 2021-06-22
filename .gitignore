@@ -12,3 +12,5 @@ CTestTestfile.cmake
 .vs
 build
 out
+
+.cache/

@@ -19,6 +19,8 @@ namespace CbLib::VkEngine{
     public:
             Instance() {};
             Instance(std::string appName,ValidationLayers validationlayers);
+
+            const VkInstance& getInstance() {return instance;}
             void destruct();
     private:
         VkInstance instance;

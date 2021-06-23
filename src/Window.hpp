@@ -15,6 +15,7 @@ namespace CbLib::VkEngine{
             Window(uint32_t, uint32_t);
             void destruct();
 
+            GLFWwindow* getWindow() {return window;}
             bool should_close();
         private:
             GLFWwindow *window;

@@ -13,6 +13,7 @@
 #include "Window.hpp"
 #include "Instance.hpp"
 #include "Device.hpp"
+#include "Surface.hpp"
 
 #include "ValidationLayers.hpp"
 
@@ -34,6 +35,7 @@ namespace CbLib {
                 Window window;
                 ValidationLayers validationLayers;
                 Device device;
+                Surface surface;
         };
     }
 }

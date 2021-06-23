@@ -9,7 +9,7 @@ bool isDeviceSuitable(VkPhysicalDevice device){
 };
 
 
-PhysicalDevice::PhysicalDevice(Instance& instance){
+PhysicalDevice::PhysicalDevice(Instance instance){
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(instance.getInstance(), &deviceCount, nullptr);
 

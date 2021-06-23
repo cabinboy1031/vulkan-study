@@ -6,6 +6,7 @@
 #include <vector>
 #include <stdexcept>
 
+#define VK_USE_PLATFORM_XLIB_KHR
 #ifndef GLFW_INCLUDE_VULKAN
 #define GLFW_INCLUDE_VULKAN
 #endif

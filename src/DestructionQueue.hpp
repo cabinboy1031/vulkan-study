@@ -10,7 +10,7 @@ namespace CbLib::VkEngine{
         public:
             template <typename VkObject>
             void push(VkObject& to_destruct){
-                destructQueue.push_back(std::make_unique<VkObject>(to_destruct));
+                destructQueue.push_front(std::make_unique<VkObject>(to_destruct));
             }
 
             void flush(){

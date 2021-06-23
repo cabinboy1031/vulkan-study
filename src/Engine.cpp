@@ -16,4 +16,7 @@ Engine::Engine(){
     device = Device(instance);
     destructionQueue.push(device);
 
+    surface = Surface(instance, window);
+    destructionQueue.push(surface);
+
 }

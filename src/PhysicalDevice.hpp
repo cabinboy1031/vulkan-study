@@ -17,7 +17,7 @@ namespace CbLib::VkEngine{
     class PhysicalDevice{
         public:
             PhysicalDevice() {}
-            PhysicalDevice(Instance& instance);
+            PhysicalDevice(Instance instance);
 
             const VkPhysicalDevice getDevice() {return physicalDevice;}
         private:

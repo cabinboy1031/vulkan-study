@@ -16,7 +16,7 @@ namespace CbLib::VkEngine{
             Device() {}
             Device(Instance vkInstance);
 
-            void destruct() override { vkDestroyDevice(device, nullptr); }
+            void destruct() { vkDestroyDevice(device, nullptr); }
         private:
             PhysicalDevice selected_device;
             VkDevice device;

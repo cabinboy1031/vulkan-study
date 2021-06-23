@@ -13,6 +13,6 @@ Engine::Engine(){
     window = Window(600,800);
     destructionQueue.push(window);
 
-    device = Device(instance);
+    device = PhysicalDevice(instance);
 
 }

@@ -42,7 +42,7 @@ namespace CbLib::VkEngine{
             const bool enabled= false;
             #endif
             const std::vector<const char*> layers= {
-            "VK_LAYER_KHRONOS_validation"
+            "VK_LAYER_KHRONOS_validation",
             };
     };
 }

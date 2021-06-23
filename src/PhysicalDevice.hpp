@@ -2,6 +2,7 @@
 #define __VULKAN_DEVICE_HPP_
 
 #include <stdexcept>
+#include <optional>
 
 #ifndef GLFW_INCLUDE_VULKAN
 #define GLFW_INCLUDE_VULKAN
@@ -10,18 +11,17 @@
 
 #include "Instance.hpp"
 #include "IVkObject.hpp"
+#include "QueueFamily.hpp"
 
 namespace CbLib::VkEngine{
-    class Device:public IVkObject{
+    class PhysicalDevice{
         public:
-            Device() {};
-            Device(Instance& instance);
-
-            void destruct() {};
+            PhysicalDevice() {}
+            PhysicalDevice(Instance& instance);
         private:
             std::vector<VkPhysicalDevice> devices;
             VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-
+            QueueFamily qFamily;
     };
 }
 

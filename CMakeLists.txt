@@ -19,6 +19,7 @@ add_executable(vulkan-engine
   src/Engine.cpp
   src/PhysicalDevice.cpp
   src/QueueFamily.cpp
+  src/Device.cpp
   )
 
 

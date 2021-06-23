@@ -12,7 +12,7 @@
 #include "DestructionQueue.hpp"
 #include "Window.hpp"
 #include "Instance.hpp"
-#include "PhysicalDevice.hpp"
+#include "Device.hpp"
 
 #include "ValidationLayers.hpp"
 
@@ -33,8 +33,7 @@ namespace CbLib {
                 Instance instance;
                 Window window;
                 ValidationLayers validationLayers;
-                PhysicalDevice device;
-
+                Device device;
         };
     }
 }

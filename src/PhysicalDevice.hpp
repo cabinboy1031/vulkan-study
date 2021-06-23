@@ -18,6 +18,8 @@ namespace CbLib::VkEngine{
         public:
             PhysicalDevice() {}
             PhysicalDevice(Instance& instance);
+
+            const VkPhysicalDevice getDevice() {return physicalDevice;}
         private:
             std::vector<VkPhysicalDevice> devices;
             VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
